@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Asistencia{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Registrar Asistencia</li>
+{% endblock %}
+
+{% block page_title %}
+    <i class="bi bi-calendar-check"></i> Registrar Asistencia
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'indicadores:dashboard' %}" class="btn btn-secondary">
+    <i class="bi bi-arrow-left"></i> Volver
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-pencil-square"></i> Formulario de Asistencia
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.curso.id_for_label }}" class="form-label">
+                            Curso <span class="text-danger">*</span>
+                        </label>
+                        {{ form.curso }}
+                        {% if form.curso.errors %}
+                            <div class="text-danger small mt-1">{{ form.curso.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.fecha.id_for_label }}" class="form-label">
+                            Fecha <span class="text-danger">*</span>
+                        </label>
+                        {{ form.fecha }}
+                        {% if form.fecha.errors %}
+                            <div class="text-danger small mt-1">{{ form.fecha.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.estudiante.id_for_label }}" class="form-label">
+                            Estudiante <span class="text-danger">*</span>
+                        </label>
+                        {{ form.estudiante }}
+                        {% if form.estudiante.errors %}
+                            <div class="text-danger small mt-1">{{ form.estudiante.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.estado.id_for_label }}" class="form-label">
+                            Estado <span class="text-danger">*</span>
+                        </label>
+                        {{ form.estado }}
+                        {% if form.estado.errors %}
+                            <div class="text-danger small mt-1">{{ form.estado.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.observaciones.id_for_label }}" class="form-label">
+                            Observaciones
+                        </label>
+                        {{ form.observaciones }}
+                        {% if form.observaciones.errors %}
+                            <div class="text-danger small mt-1">{{ form.observaciones.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Limpiar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Registrar Asistencia
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Estados de Asistencia
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <span class="badge bg-success me-2"><i class="bi bi-check-circle"></i></span>
+                        <strong>Presente:</strong> El estudiante asistió a clase
+                    </li>
+                    <li class="mb-2">
+                        <span class="badge bg-danger me-2"><i class="bi bi-x-circle"></i></span>
+                        <strong>Ausente:</strong> El estudiante no asistió
+                    </li>
+                    <li class="mb-2">
+                        <span class="badge bg-warning me-2"><i class="bi bi-clock"></i></span>
+                        <strong>Tardanza:</strong> Llegó tarde a clase
+                    </li>
+                    <li class="mb-2">
+                        <span class="badge bg-info me-2"><i class="bi bi-file-text"></i></span>
+                        <strong>Justificada:</strong> Ausencia con justificación
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <i class="bi bi-graph-up"></i> Resumen del Día
+            </div>
+            <div class="card-body">
+                {% if resumen_hoy %}
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h3 class="text-success mb-0">{{ resumen_hoy.presentes }}</h3>
+                            <small class="text-muted">Presentes</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h3 class="text-danger mb-0">{{ resumen_hoy.ausentes }}</h3>
+                            <small class="text-muted">Ausentes</small>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="text-warning mb-0">{{ resumen_hoy.tardanzas }}</h3>
+                            <small class="text-muted">Tardanzas</small>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="text-info mb-0">{{ resumen_hoy.justificadas }}</h3>
+                            <small class="text-muted">Justificadas</small>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-muted small mb-0">No hay registros de asistencia hoy.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

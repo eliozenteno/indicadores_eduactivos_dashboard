@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}Estudiantes{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Estudiantes</li>
+{% endblock %}
+
+{% block page_title %}
+    <i class="bi bi-people"></i> Lista de Estudiantes
+{% endblock %}
+
+{% block page_actions %}
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoEstudianteModal">
+    <i class="bi bi-plus-circle"></i> Nuevo Estudiante
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <i class="bi bi-table"></i> Estudiantes Registrados ({{ estudiantes.count }})
+            </div>
+            <div class="col-auto">
+                <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Buscar estudiante...">
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if estudiantes %}
+            <div class="table-responsive">
+                <table class="table table-hover" id="estudiantesTable">
+                    <thead>
+                        <tr>
+                            <th>CI</th>
+                            <th>Nombre Completo</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Fecha Nacimiento</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for estudiante in estudiantes %}
+                            <tr>
+                                <td>{{ estudiante.ci }}</td>
+                                <td>
+                                    <strong>{{ estudiante.nombre_completo }}</strong>
+                                </td>
+                                <td>{{ estudiante.email|default:"-" }}</td>
+                                <td>{{ estudiante.telefono|default:"-" }}</td>
+                                <td>{{ estudiante.fecha_nacimiento|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if estudiante.activo %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="#" class="btn btn-outline-primary" title="Ver detalles">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-outline-success" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                <p class="text-muted mt-3">No hay estudiantes registrados aún.</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoEstudianteModal">
+                    <i class="bi bi-plus-circle"></i> Registrar Primer Estudiante
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal Nuevo Estudiante -->
+<div class="modal fade" id="nuevoEstudianteModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-person-plus"></i> Registrar Nuevo Estudiante
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.nombres.id_for_label }}" class="form-label">Nombres *</label>
+                            {{ form.nombres }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.apellidos.id_for_label }}" class="form-label">Apellidos *</label>
+                            {{ form.apellidos }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.ci.id_for_label }}" class="form-label">Cédula de Identidad *</label>
+                            {{ form.ci }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.fecha_nacimiento.id_for_label }}" class="form-label">Fecha de Nacimiento *</label>
+                            {{ form.fecha_nacimiento }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono</label>
+                            {{ form.telefono }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.direccion.id_for_label }}" class="form-label">Dirección</label>
+                        {{ form.direccion }}
+                    </div>
+                    <div class="form-check">
+                        {{ form.activo }}
+                        <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                            Estudiante activo
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Guardar Estudiante
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Búsqueda en tiempo real
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#estudiantesTable tbody tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}Apoderados{% endblock %}
+{% block page_title %}<i class="bi bi-person-hearts"></i> Gestión de Apoderados{% endblock %}
+{% block page_actions %}
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoApoderadoModal">
+    <i class="bi bi-plus-circle"></i> Nuevo Apoderado
+</button>
+<a href="{% url 'indicadores:vincular_apoderado' %}" class="btn btn-success">
+    <i class="bi bi-link"></i> Vincular con Estudiante
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header"><h5><i class="bi bi-list"></i> Lista de Apoderados</h5></div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-info">
+                    <tr>
+                        <th>Nombre Completo</th>
+                        <th>CI</th>
+                        <th>Parentesco</th>
+                        <th>Teléfono</th>
+                        <th>Email</th>
+                        <th>Estudiantes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for apoderado in apoderados %}
+                    <tr>
+                        <td><strong>{{ apoderado.nombre_completo }}</strong></td>
+                        <td>{{ apoderado.ci }}</td>
+                        <td>
+                            <span class="badge bg-secondary">
+                                {{ apoderado.get_parentesco_display }}
+                            </span>
+                        </td>
+                        <td>{{ apoderado.telefono }}</td>
+                        <td><small>{{ apoderado.email }}</small></td>
+                        <td class="text-center">
+                            <span class="badge bg-success">
+                                {{ apoderado.estudianteapoderado_set.filter.count }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center text-muted">No hay apoderados registrados</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="nuevoApoderadoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Registrar Apoderado</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombres</label>
+                            {{ form.nombres }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellidos</label>
+                            {{ form.apellidos }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">CI</label>
+                            {{ form.ci }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Parentesco</label>
+                            {{ form.parentesco }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono</label>
+                            {{ form.telefono }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Dirección</label>
+                            {{ form.direccion }}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-info">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

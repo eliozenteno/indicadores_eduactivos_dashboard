@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Vincular Apoderado{% endblock %}
+{% block page_title %}<i class="bi bi-link-45deg"></i> Vincular Estudiante con Apoderado{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Crear Vínculo</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Estudiante</label>
+                        {{ form.estudiante }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Apoderado</label>
+                        {{ form.apoderado }}
+                    </div>
+                    <div class="form-check mb-3">
+                        {{ form.es_principal }}
+                        <label class="form-check-label">Es apoderado principal</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        {{ form.activa }}
+                        <label class="form-check-label">Relación activa</label>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-link"></i> Vincular
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Vínculos Activos Recientes</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>Apoderado</th>
+                                <th>Principal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vinculo in vinculos %}
+                            <tr>
+                                <td>
+                                    <i class="bi bi-person-fill text-primary"></i>
+                                    {{ vinculo.estudiante.nombre_completo }}
+                                </td>
+                                <td>
+                                    <i class="bi bi-person-heart text-success"></i>
+                                    {{ vinculo.apoderado.nombre_completo }}
+                                </td>
+                                <td class="text-center">
+                                    {% if vinculo.es_principal %}
+                                        <span class="badge bg-warning">Principal</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Secundario</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">
+                                    No hay vínculos registrados
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

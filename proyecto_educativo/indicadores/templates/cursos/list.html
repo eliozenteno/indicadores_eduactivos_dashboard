@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestión de Cursos{% endblock %}
+
+{% block page_title %}
+    <i class="bi bi-book"></i> Gestión de Cursos
+{% endblock %}
+
+{% block page_actions %}
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoCursoModal">
+    <i class="bi bi-plus-circle"></i> Nuevo Curso
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-list"></i> Lista de Cursos Activos</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Grado</th>
+                        <th>Asignatura</th>
+                        <th>Sección</th>
+                        <th>Profesor</th>
+                        <th>Periodo</th>
+                        <th>Estudiantes</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for curso in cursos %}
+                    <tr>
+                        <td><span class="badge bg-primary">{{ curso.grado.nombre }}</span></td>
+                        <td><strong>{{ curso.asignatura.nombre }}</strong></td>
+                        <td class="text-center">{{ curso.seccion }}</td>
+                        <td>
+                            <small>
+                                <i class="bi bi-person"></i>
+                                {{ curso.profesor.nombre_completo }}
+                            </small>
+                        </td>
+                        <td><small>{{ curso.periodo_academico.nombre }}</small></td>
+                        <td class="text-center">
+                            <span class="badge bg-info">
+                                {{ curso.inscripcion_set.count }} alumnos
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="#" class="btn btn-outline-primary" title="Ver">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'indicadores:inscripciones_list' %}?curso={{ curso.id }}" 
+                                   class="btn btn-outline-success" title="Inscripciones">
+                                    <i class="bi bi-person-plus"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            <i class="bi bi-inbox"></i> No hay cursos registrados
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nuevo Curso -->
+<div class="modal fade" id="nuevoCursoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-book"></i> Crear Nuevo Curso</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Grado</label>
+                        {{ form.grado }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Asignatura</label>
+                        {{ form.asignatura }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Profesor</label>
+                        {{ form.profesor }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Sección</label>
+                            {{ form.seccion }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Periodo Académico</label>
+                            {{ form.periodo_academico }}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Crear Curso
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

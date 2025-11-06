@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Calificación{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Registrar Calificación</li>
+{% endblock %}
+
+{% block page_title %}
+    <i class="bi bi-journal-check"></i> Registrar Calificación
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'indicadores:dashboard' %}" class="btn btn-secondary">
+    <i class="bi bi-arrow-left"></i> Volver
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-pencil-square"></i> Formulario de Calificación
+            </div>
+            <div class="card-body">
+                <form method="post" id="calificacionForm">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.evaluacion.id_for_label }}" class="form-label">
+                            Evaluación <span class="text-danger">*</span>
+                        </label>
+                        {{ form.evaluacion }}
+                        {% if form.evaluacion.errors %}
+                            <div class="text-danger small mt-1">{{ form.evaluacion.errors }}</div>
+                        {% endif %}
+                        <small class="form-text text-muted">Seleccione la evaluación para la cual desea registrar la calificación.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.estudiante.id_for_label }}" class="form-label">
+                            Estudiante <span class="text-danger">*</span>
+                        </label>
+                        {{ form.estudiante }}
+                        {% if form.estudiante.errors %}
+                            <div class="text-danger small mt-1">{{ form.estudiante.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.nota.id_for_label }}" class="form-label">
+                            Nota (0-100) <span class="text-danger">*</span>
+                        </label>
+                        {{ form.nota }}
+                        {% if form.nota.errors %}
+                            <div class="text-danger small mt-1">{{ form.nota.errors }}</div>
+                        {% endif %}
+                        <small class="form-text text-muted">Ingrese la nota obtenida en escala de 0 a 100.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.observaciones.id_for_label }}" class="form-label">
+                            Observaciones
+                        </label>
+                        {{ form.observaciones }}
+                        {% if form.observaciones.errors %}
+                            <div class="text-danger small mt-1">{{ form.observaciones.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Limpiar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Registrar Calificación
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Ayuda
+            </div>
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2">¿Cómo registrar una calificación?</h6>
+                <ol class="small">
+                    <li>Seleccione la <strong>evaluación</strong> correspondiente</li>
+                    <li>Elija el <strong>estudiante</strong> a calificar</li>
+                    <li>Ingrese la <strong>nota</strong> obtenida (0-100)</li>
+                    <li>Opcionalmente agregue observaciones</li>
+                    <li>Haga clic en <strong>Registrar</strong></li>
+                </ol>
+                
+                <hr>
+                
+                <h6 class="card-subtitle mb-2 mt-3">Escala de calificación</h6>
+                <ul class="list-unstyled small">
+                    <li><span class="badge bg-success">90-100</span> Excelente</li>
+                    <li><span class="badge bg-primary">70-89</span> Bueno</li>
+                    <li><span class="badge bg-warning">51-69</span> Regular</li>
+                    <li><span class="badge bg-danger">0-50</span> Insuficiente</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <i class="bi bi-clock-history"></i> Últimas Calificaciones
+            </div>
+            <div class="card-body">
+                {% if ultimas_calificaciones %}
+                    <div class="list-group list-group-flush">
+                        {% for cal in ultimas_calificaciones %}
+                            <div class="list-group-item px-0 py-2">
+                                <div class="d-flex justify-content-between">
+                                    <small class="fw-bold">{{ cal.estudiante.apellidos }}</small>
+                                    <span class="badge bg-primary">{{ cal.nota }}</span>
+                                </div>
+                                <small class="text-muted">{{ cal.evaluacion.nombre|truncatewords:3 }}</small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted small mb-0">No hay calificaciones registradas aún.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

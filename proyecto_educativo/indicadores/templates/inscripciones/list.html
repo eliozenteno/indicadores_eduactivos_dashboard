@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Inscripciones{% endblock %}
+{% block page_title %}<i class="bi bi-person-plus"></i> Gestión de Inscripciones{% endblock %}
+{% block page_actions %}
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevaInscripcionModal">
+    <i class="bi bi-plus-circle"></i> Nueva Inscripción
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header"><h5><i class="bi bi-list"></i> Últimas Inscripciones</h5></div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-success">
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Curso</th>
+                        <th>Grado</th>
+                        <th>Fecha Inscripción</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inscripcion in inscripciones %}
+                    <tr>
+                        <td><strong>{{ inscripcion.estudiante.nombre_completo }}</strong></td>
+                        <td>{{ inscripcion.curso.asignatura.nombre }}</td>
+                        <td><span class="badge bg-primary">{{ inscripcion.curso.grado.nombre }}</span></td>
+                        <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if inscripcion.activa %}
+                                <span class="badge bg-success">Activa</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactiva</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted">No hay inscripciones</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="nuevaInscripcionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Inscribir Estudiante</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Estudiante</label>
+                        {{ form.estudiante }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Curso</label>
+                        {{ form.curso }}
+                    </div>
+                    <div class="form-check">
+                        {{ form.activa }}
+                        <label class="form-check-label">Inscripción Activa</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Inscribir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

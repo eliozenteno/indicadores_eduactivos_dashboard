@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard Educativo{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Chart.js para gráficas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    {% block extra_css %}{% endblock %}
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.85);
+            padding: 0.75rem 1.25rem;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            font-weight: 500;
+        }
+        .sidebar .nav-link i {
+            margin-right: 0.5rem;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+            margin-bottom: 1.5rem;
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            font-weight: 600;
+        }
+        .stat-card {
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        }
+        .stat-card.primary { border-left-color: #3b82f6; }
+        .stat-card.success { border-left-color: #10b981; }
+        .stat-card.warning { border-left-color: #f59e0b; }
+        .stat-card.danger { border-left-color: #ef4444; }
+        .main-content {
+            padding: 2rem;
+        }
+        .navbar {
+            background-color: white;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+        }
+        .breadcrumb {
+            background-color: transparent;
+            padding: 0;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h5 class="text-white fw-bold">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            Dashboard Educativo
+                        </h5>
+                        <small class="text-white-50">Sistema de Indicadores</small>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
+                               href="{% url 'indicadores:dashboard' %}">
+                                <i class="bi bi-speedometer2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item mt-3">
+                            <small class="text-white-50 text-uppercase px-3">Personas</small>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'estudiantes_list' %}active{% endif %}" 
+                               href="{% url 'indicadores:estudiantes_list' %}">
+                                <i class="bi bi-people"></i>
+                                Estudiantes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'profesores_list' %}active{% endif %}" 
+                               href="{% url 'indicadores:profesores_list' %}">
+                                <i class="bi bi-person-badge"></i>
+                                Profesores
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'apoderados_list' %}active{% endif %}" 
+                               href="{% url 'indicadores:apoderados_list' %}">
+                                <i class="bi bi-person-hearts"></i>
+                                Apoderados
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item mt-3">
+                            <small class="text-white-50 text-uppercase px-3">Académico</small>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'cursos_list' %}active{% endif %}" 
+                               href="{% url 'indicadores:cursos_list' %}">
+                                <i class="bi bi-book"></i>
+                                Cursos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'inscripciones_list' %}active{% endif %}" 
+                               href="{% url 'indicadores:inscripciones_list' %}">
+                                <i class="bi bi-person-plus"></i>
+                                Inscripciones
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'evaluaciones_list' %}active{% endif %}" 
+                               href="{% url 'indicadores:evaluaciones_list' %}">
+                                <i class="bi bi-file-earmark-text"></i>
+                                Evaluaciones
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item mt-3">
+                            <small class="text-white-50 text-uppercase px-3">Registro</small>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'registrar_calificacion' %}active{% endif %}" 
+                               href="{% url 'indicadores:registrar_calificacion' %}">
+                                <i class="bi bi-journal-check"></i>
+                                Calificaciones
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'registrar_asistencia' %}active{% endif %}" 
+                               href="{% url 'indicadores:registrar_asistencia' %}">
+                                <i class="bi bi-calendar-check"></i>
+                                Asistencia
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item mt-3">
+                            <small class="text-white-50 text-uppercase px-3">Sistema</small>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/api/" target="_blank">
+                                <i class="bi bi-code-square"></i>
+                                API REST
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/" target="_blank">
+                                <i class="bi bi-gear"></i>
+                                Admin
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <!-- Navbar -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-white rounded mb-4">
+                    <div class="container-fluid">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="{% url 'indicadores:dashboard' %}">Inicio</a></li>
+                                {% block breadcrumb %}{% endblock %}
+                            </ol>
+                        </nav>
+                        <div class="d-flex align-items-center">
+                            <span class="text-muted me-3">
+                                <i class="bi bi-person-circle"></i>
+                                {% if user.is_authenticated %}{{ user.username }}{% else %}Invitado{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- Page Title -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h2">{% block page_title %}Dashboard{% endblock %}</h1>
+                    {% block page_actions %}{% endblock %}
+                </div>
+
+                <!-- Messages -->
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Content -->
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Evaluaciones{% endblock %}
+{% block page_title %}<i class="bi bi-file-earmark-text"></i> Gestión de Evaluaciones{% endblock %}
+{% block page_actions %}
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevaEvaluacionModal">
+    <i class="bi bi-plus-circle"></i> Nueva Evaluación
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header"><h5><i class="bi bi-list"></i> Evaluaciones Programadas</h5></div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-warning">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Curso</th>
+                        <th>Tipo</th>
+                        <th>Fecha</th>
+                        <th>Ponderación</th>
+                        <th>Calificaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evaluacion in evaluaciones %}
+                    <tr>
+                        <td><strong>{{ evaluacion.nombre }}</strong></td>
+                        <td>
+                            <small>
+                                {{ evaluacion.curso.asignatura.nombre }} -
+                                {{ evaluacion.curso.grado.nombre }}
+                            </small>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ evaluacion.tipo|yesno:'primary,success,warning,info' }}">
+                                {{ evaluacion.get_tipo_display }}
+                            </span>
+                        </td>
+                        <td>{{ evaluacion.fecha|date:"d/m/Y" }}</td>
+                        <td class="text-center">{{ evaluacion.ponderacion }}%</td>
+                        <td class="text-center">
+                            <span class="badge bg-info">
+                                {{ evaluacion.calificacion_set.count }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center text-muted">No hay evaluaciones</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="nuevaEvaluacionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title">Crear Evaluación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Curso</label>
+                        {{ form.curso }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de la Evaluación</label>
+                        {{ form.nombre }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo</label>
+                            {{ form.tipo }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha</label>
+                            {{ form.fecha }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ponderación (%)</label>
+                        {{ form.ponderacion }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        {{ form.descripcion }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning">Crear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

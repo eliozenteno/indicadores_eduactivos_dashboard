@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestión de Profesores{% endblock %}
+
+{% block page_title %}
+    <i class="bi bi-person-badge"></i> Gestión de Profesores
+{% endblock %}
+
+{% block page_actions %}
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoProfesorModal">
+    <i class="bi bi-plus-circle"></i> Nuevo Profesor
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-0"><i class="bi bi-list"></i> Lista de Profesores</h5>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" id="searchProfesor" class="form-control" placeholder="🔍 Buscar profesor...">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="profesoresTable">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Nombres</th>
+                                <th>Apellidos</th>
+                                <th>Email</th>
+                                <th>Especialidad</th>
+                                <th>Teléfono</th>
+                                <th>Estado</th>
+                                <th width="100px">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for profesor in profesores %}
+                            <tr>
+                                <td>{{ profesor.nombres }}</td>
+                                <td>{{ profesor.apellidos }}</td>
+                                <td><small>{{ profesor.email }}</small></td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        {{ profesor.especialidad|default:"Sin especialidad" }}
+                                    </span>
+                                </td>
+                                <td>{{ profesor.telefono }}</td>
+                                <td>
+                                    {% if profesor.activo %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="#" class="btn btn-outline-primary" title="Ver">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-outline-warning" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">
+                                    <i class="bi bi-inbox"></i> No hay profesores registrados
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nuevo Profesor -->
+<div class="modal fade" id="nuevoProfesorModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-person-plus"></i> Registrar Nuevo Profesor</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombres</label>
+                            {{ form.nombres }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellidos</label>
+                            {{ form.apellidos }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono</label>
+                            {{ form.telefono }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Especialidad</label>
+                            {{ form.especialidad }}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mt-4">
+                                {{ form.activo }}
+                                <label class="form-check-label">Activo</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Guardar Profesor
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Búsqueda en tiempo real
+document.getElementById('searchProfesor').addEventListener('keyup', function() {
+    const filter = this.value.toLowerCase();
+    const table = document.getElementById('profesoresTable');
+    const rows = table.getElementsByTagName('tr');
+    
+    for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Indicadores Educativos{% endblock %}
+
+{% block page_title %}
+    <i class="bi bi-speedometer2"></i> Dashboard de Indicadores Educativos
+{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase mb-2">Estudiantes Activos</h6>
+                        <h2 class="mb-0">{{ total_estudiantes }}</h2>
+                    </div>
+                    <div class="text-primary" style="font-size: 3rem;">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase mb-2">Profesores</h6>
+                        <h2 class="mb-0">{{ total_profesores }}</h2>
+                    </div>
+                    <div class="text-success" style="font-size: 3rem;">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase mb-2">Cursos Activos</h6>
+                        <h2 class="mb-0">{{ total_cursos }}</h2>
+                    </div>
+                    <div class="text-warning" style="font-size: 3rem;">
+                        <i class="bi bi-book-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card danger">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase mb-2">Promedio General</h6>
+                        <h2 class="mb-0">{{ promedio_general|floatformat:1|default:"N/A" }}</h2>
+                    </div>
+                    <div class="text-danger" style="font-size: 3rem;">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mt-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-bar-chart-line"></i> Promedio de Calificaciones por Curso
+            </div>
+            <div class="card-body">
+                <canvas id="promediosPorCursoChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-pie-chart"></i> Distribución de Asistencia
+            </div>
+            <div class="card-body">
+                <canvas id="asistenciaChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-lightning-fill"></i> Acciones Rápidas
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="{% url 'indicadores:estudiantes_list' %}" class="btn btn-primary w-100">
+                            <i class="bi bi-person-plus"></i> Registrar Estudiante
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'indicadores:registrar_calificacion' %}" class="btn btn-success w-100">
+                            <i class="bi bi-journal-check"></i> Registrar Calificación
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'indicadores:registrar_asistencia' %}" class="btn btn-warning w-100">
+                            <i class="bi bi-calendar-check"></i> Registrar Asistencia
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/api/" target="_blank" class="btn btn-info w-100">
+                            <i class="bi bi-code-square"></i> Ver API REST
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row mt-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-clock-history"></i> Calificaciones Recientes
+            </div>
+            <div class="card-body">
+                {% if calificaciones_recientes %}
+                    <div class="list-group">
+                        {% for cal in calificaciones_recientes %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ cal.estudiante.nombre_completo }}</h6>
+                                    <small class="text-muted">{{ cal.fecha_registro|date:"d/m/Y H:i" }}</small>
+                                </div>
+                                <p class="mb-1">{{ cal.evaluacion.nombre }} - <strong>{{ cal.nota }}</strong></p>
+                                <small class="text-muted">{{ cal.evaluacion.curso }}</small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center py-4">No hay calificaciones registradas aún.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-exclamation-triangle"></i> Estudiantes en Riesgo
+            </div>
+            <div class="card-body">
+                {% if estudiantes_riesgo %}
+                    <div class="list-group">
+                        {% for est in estudiantes_riesgo %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ est.nombre_completo }}</h6>
+                                    <span class="badge bg-danger">Riesgo</span>
+                                </div>
+                                <p class="mb-1">Promedio: <strong>{{ est.promedio|floatformat:2 }}</strong></p>
+                                <small class="text-muted">CI: {{ est.ci }}</small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-success text-center py-4">
+                        <i class="bi bi-check-circle"></i> No hay estudiantes en riesgo académico.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Datos para los gráficos (pasados desde el backend)
+    const promediosCursos = {{ promedios_cursos_json|safe }};
+    const asistenciaData = {{ asistencia_data_json|safe }};
+
+    // Gráfico de Promedios por Curso
+    if (promediosCursos && promediosCursos.labels && promediosCursos.labels.length > 0) {
+        const ctx1 = document.getElementById('promediosPorCursoChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: promediosCursos.labels,
+                datasets: [{
+                    label: 'Promedio',
+                    data: promediosCursos.data,
+                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                    borderColor: 'rgb(59, 130, 246)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    // Gráfico de Asistencia
+    if (asistenciaData && asistenciaData.labels && asistenciaData.labels.length > 0) {
+        const ctx2 = document.getElementById('asistenciaChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: asistenciaData.labels,
+                datasets: [{
+                    data: asistenciaData.data,
+                    backgroundColor: [
+                        'rgba(16, 185, 129, 0.8)',  // verde presente
+                        'rgba(239, 68, 68, 0.8)',   // rojo ausente
+                        'rgba(245, 158, 11, 0.8)',  // amarillo tardanza
+                        'rgba(59, 130, 246, 0.8)'   // azul justificada
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}
