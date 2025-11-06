@@ -67,10 +67,19 @@ Thumbs.db
 check_tables.py
 verify_database.py
 
-# Archivos de backup
+# Archivos de backup y base de datos
 *.backup
 *.bak
 *.tmp
+*.sql.backup
+*.dump
+*.pg_dump
+backups/
+data_backup/
+
+# Base de datos locales (no subir)
+*.db
+local_database/
 
 # Logs
 logs/
